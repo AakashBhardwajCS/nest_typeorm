@@ -11,16 +11,19 @@ import { NotFoundFilter } from './common/not-found.filter.js';
 import { RequestLoggerMiddleware } from './common/request-logger.middleware.js';
 import { DatabaseModule } from './database/database.module.js';
 import { FeatureModule } from './examples/feature.module.js';
+import { MailModule } from './mail/mail.module.js';
 import { PostsModule } from './posts/posts.module.js';
 import { AppController } from './app.controller.js';
 import { AppService } from './app.service.js';
 import { SeedModule } from './seed/seed.module.js';
+import { MailerModule } from '@nestjs-modules/mailer'
 
 @Module({
   imports: [
     AppConfigModule,
     DatabaseModule,
     PostsModule,
+    MailModule,
     // Loaded unless EXAMPLES_ENABLED=false (waits for env vars to be loaded)
     ConditionalModule.registerWhen(FeatureModule, 'EXAMPLES_ENABLED'),
     SeedModule,

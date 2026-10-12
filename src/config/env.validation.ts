@@ -51,6 +51,23 @@ export class EnvironmentVariables {
   @IsOptional()
   @IsBooleanString()
   EXAMPLES_ENABLED?: string;
+
+  @IsString()
+  EMAIL_HOST: string;
+
+  @IsNumber()
+  @Min(0)
+  @Max(65535)
+  EMAIL_PORT: number;
+
+  @IsString()
+  EMAIL_USERNAME: string;
+
+  @IsString()
+  EMAIL_PASSWORD: string;
+
+  @IsString()
+  EMAIL_FROM: string;
 }
 
 // Passed to ConfigModule.forRoot({ validate }).

@@ -22,6 +22,10 @@ export class AppConfigService {
     return this.configService.get('NODE_ENV', { infer: true }) === 'production';
   }
 
+  get url(): string {
+    return this.app.url;
+  }
+
   get supportEmail(): string | undefined {
     return this.app.supportEmail;
   }

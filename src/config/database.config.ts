@@ -1,0 +1,19 @@
+import { registerAs } from '@nestjs/config';
+import type { TypeOrmModuleOptions } from '@nestjs/typeorm';
+
+// Returns TypeORM options directly so it can be handed to
+// TypeOrmModule.forRootAsync(databaseConfig.asProvider()).
+export default registerAs(
+  'database',
+  (): TypeOrmModuleOptions => ({
+    type: 'postgres',
+    host: process.env.DB_HOST,
+    port: parseInt(process.env.DB_PORT ?? '5432', 10),
+    username: process.env.DB_USERNAME,
+    password: process.env.DB_PASSWORD,
+    database: process.env.DB_NAME,
+    synchronize: process.env.DB_SYNC === 'true',
+    autoLoadEntities: true,
+    logging: ['error', 'warn'],
+  }),
+);

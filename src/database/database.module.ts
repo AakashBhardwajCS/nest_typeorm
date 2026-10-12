@@ -1,28 +1,14 @@
-import { DynamicModule, Module } from '@nestjs/common';
+import { Module } from '@nestjs/common';
+import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import databaseConfig from '../config/database.config.js';
 
-export interface DatabaseOptions {
-  host: string;
-  port: number;
-  username: string;
-  password: string;
-  database: string;
-  synchronize: boolean;
-}
-
-@Module({})
-export class DatabaseModule {
-  static forRoot(options: DatabaseOptions): DynamicModule {
-    return {
-      module: DatabaseModule,
-      imports: [
-        TypeOrmModule.forRoot({
-          type: 'postgres',
-          ...options,
-          autoLoadEntities: true,
-          logging: ['error', 'warn'],
-        }),
-      ],
-    };
-  }
-}
+@Module({
+  imports: [
+    // Partial registration: the 'database' namespace is only loaded here
+    ConfigModule.forFeature(databaseConfig),
+    // Turns the namespace into a { useFactory, inject } provider for TypeORM
+    TypeOrmModule.forRootAsync(databaseConfig.asProvider()),
+  ],
+})
+export class DatabaseModule {}

@@ -4,7 +4,9 @@ import {
   NestModule,
   ValidationPipe,
 } from '@nestjs/common';
+import { ConditionalModule } from '@nestjs/config';
 import { APP_FILTER, APP_PIPE } from '@nestjs/core';
+import { AppConfigModule } from './config/config.module.js';
 import { NotFoundFilter } from './common/not-found.filter.js';
 import { RequestLoggerMiddleware } from './common/request-logger.middleware.js';
 import { DatabaseModule } from './database/database.module.js';
@@ -12,19 +14,16 @@ import { FeatureModule } from './examples/feature.module.js';
 import { PostsModule } from './posts/posts.module.js';
 import { AppController } from './app.controller.js';
 import { AppService } from './app.service.js';
+import { SeedModule } from './seed/seed.module.js';
 
 @Module({
   imports: [
-    DatabaseModule.forRoot({
-      host: process.env.DB_HOST ?? '127.0.0.1',
-      port: Number(process.env.DB_PORT ?? 5435),
-      username: process.env.DB_USERNAME ?? 'postgres',
-      password: process.env.DB_PASSWORD ?? 'postgres',
-      database: process.env.DB_NAME ?? 'qdeck_demo',
-      synchronize: process.env.DB_SYNC === 'true',
-    }),
+    AppConfigModule,
+    DatabaseModule,
     PostsModule,
-    FeatureModule,
+    // Loaded unless EXAMPLES_ENABLED=false (waits for env vars to be loaded)
+    ConditionalModule.registerWhen(FeatureModule, 'EXAMPLES_ENABLED'),
+    SeedModule,
   ],
   controllers: [AppController],
   providers: [

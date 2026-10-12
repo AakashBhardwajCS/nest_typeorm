@@ -1,5 +1,7 @@
+import { ConfigService } from '@nestjs/config';
 import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module.js';
+import type { EnvironmentVariables } from './config/env.validation.js';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -8,7 +10,8 @@ async function bootstrap() {
   // Needed for onModuleDestroy / beforeApplicationShutdown to run on Ctrl+C
   app.enableShutdownHooks();
 
-  await app.listen(process.env.PORT ?? 3000);
+  const configService = app.get(ConfigService<EnvironmentVariables, true>);
+  await app.listen(configService.get('PORT', { infer: true }));
 }
 
 await bootstrap();

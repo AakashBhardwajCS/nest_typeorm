@@ -48,6 +48,14 @@ export class EnvironmentVariables {
   @IsBooleanString()
   DB_SYNC?: string;
 
+  // something like mongodb://127.0.0.1:27017/nest_demo
+  @IsString()
+  MONGO_URI: string;
+
+  // second database used by the events module
+  @IsString()
+  MONGO_EVENTS_URI: string;
+
   @IsOptional()
   @IsBooleanString()
   EXAMPLES_ENABLED?: string;

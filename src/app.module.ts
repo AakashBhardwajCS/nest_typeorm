@@ -10,6 +10,9 @@ import { AppConfigModule } from './config/config.module.js';
 import { NotFoundFilter } from './common/not-found.filter.js';
 import { RequestLoggerMiddleware } from './common/request-logger.middleware.js';
 import { DatabaseModule } from './database/database.module.js';
+import { MongoModule } from './database/mongo.module.js';
+import { CatsModule } from './cats/cats.module.js';
+import { EventsModule } from './events/events.module.js';
 import { FeatureModule } from './examples/feature.module.js';
 import { MailModule } from './mail/mail.module.js';
 import { PostsModule } from './posts/posts.module.js';
@@ -22,7 +25,10 @@ import { MailerModule } from '@nestjs-modules/mailer'
   imports: [
     AppConfigModule,
     DatabaseModule,
+    MongoModule,
     PostsModule,
+    CatsModule,
+    EventsModule,
     MailModule,
     // Loaded unless EXAMPLES_ENABLED=false (waits for env vars to be loaded)
     ConditionalModule.registerWhen(FeatureModule, 'EXAMPLES_ENABLED'),

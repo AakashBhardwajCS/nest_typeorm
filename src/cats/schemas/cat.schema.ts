@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory, Virtual } from '@nestjs/mongoose';
-import { HydratedDocument, HydratedSingleSubdocument } from 'mongoose';
+import { HydratedDocument, HydratedSingleSubdocument, Types } from 'mongoose';
 import { Owner, OwnerSchema } from './owner.schema.js'
 
 // NESTJS MONGO DOCS: MODEL INJECTION (defining the schema with @Schema, @Prop and SchemaFactory)
@@ -31,6 +31,12 @@ export class Cat {
   // nested owner object, validated with its own schema
   @Prop({ type: OwnerSchema })
   owner?: Owner;
+
+  // PLUGINS (mongoose-autopopulate, registered in cats.module.ts)
+  // only the other cat's id is stored, but autopopulate swaps it for the full cat whenever we read.
+  // maxDepth: 1 stops it there, otherwise cats pointing at each other would populate forever
+  @Prop({ type: Types.ObjectId, ref: 'Cat', autopopulate: { maxDepth: 1 } })
+  bestFriend?: Types.ObjectId | Cat;
 
   // VIRTUALS
   // never saved in mongo, worked out every time the cat is read

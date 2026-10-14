@@ -4,6 +4,7 @@ import {
   IsArray,
   IsEmail,
   IsInt,
+  IsMongoId,
   IsNotEmpty,
   IsOptional,
   IsString,
@@ -47,6 +48,11 @@ export class CreateCatDto {
   @ValidateNested()
   @Type(() => OwnerDto)
   owner?: OwnerDto;
+
+  // id of another cat, it comes back as the full cat thanks to autopopulate
+  @IsOptional()
+  @IsMongoId()
+  bestFriend?: string;
 }
 
 // same fields as CreateCatDto but everything is optional, so PATCH can send just what changed
@@ -76,6 +82,11 @@ export class UpdateCatDto {
   @ValidateNested()
   @Type(() => OwnerDto)
   owner?: OwnerDto;
+
+  // id of another cat, it comes back as the full cat thanks to autopopulate
+  @IsOptional()
+  @IsMongoId()
+  bestFriend?: string;
 }
 
 // body for POST /cats/bulk, every item is validated like a normal create

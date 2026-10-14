@@ -2,6 +2,7 @@ import {
   MiddlewareConsumer,
   Module,
   NestModule,
+  StandardSchemaValidationPipe,
   ValidationPipe,
 } from '@nestjs/common';
 import { ConditionalModule } from '@nestjs/config';
@@ -37,6 +38,12 @@ import { MailerModule } from '@nestjs-modules/mailer'
     // Custom pipes can also be created as classes implementing PipeTransform.
       provide: APP_PIPE,
       useValue: new ValidationPipe({ whitelist: true, transform: true }),
+    },
+    {
+    // Validates params that carry a Standard Schema, e.g. @Body({ schema: zodSchema }).
+    // Params without a schema are skipped, so it works alongside the ValidationPipe above.
+      provide: APP_PIPE,
+      useValue: new StandardSchemaValidationPipe(),
     },
     { provide: APP_FILTER, useClass: NotFoundFilter },
   ],

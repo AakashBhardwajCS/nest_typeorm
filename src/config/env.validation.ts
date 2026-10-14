@@ -68,6 +68,18 @@ export class EnvironmentVariables {
 
   @IsString()
   EMAIL_FROM: string;
+
+  // OAuth client from Google Cloud Console (APIs & Services > Credentials)
+  @IsString()
+  GOOGLE_CLIENT_ID: string;
+
+  @IsString()
+  GOOGLE_CLIENT_SECRET: string;
+
+  // must match an "Authorized redirect URI" of the OAuth client
+  @IsOptional()
+  @IsString()
+  GOOGLE_CALLBACK_URL?: string;
 }
 
 // Passed to ConfigModule.forRoot({ validate }).

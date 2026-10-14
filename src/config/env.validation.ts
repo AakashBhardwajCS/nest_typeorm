@@ -76,6 +76,16 @@ export class EnvironmentVariables {
 
   @IsString()
   EMAIL_FROM: string;
+
+  // used to sign / verify access tokens
+  @IsString()
+  JWT_SECRET: string;
+
+  // access token lifetime in seconds
+  @IsOptional()
+  @IsNumber()
+  @Min(1)
+  JWT_EXPIRES_IN?: number;
 }
 
 // Passed to ConfigModule.forRoot({ validate }).

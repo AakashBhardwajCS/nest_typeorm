@@ -4,15 +4,16 @@ import { AppModule } from './app.module.js';
 import type { EnvironmentVariables } from './config/env.validation.js';
 import { SwaggerModule, DocumentBuilder } from '@nestjs/swagger'
 import { swaggerDocumentOptions } from './swagger/swaggerOptions.js'
+import { CatsModule } from './cats/cats.module.js'
+import { PostsModule } from './posts/posts.module.js'
 
-async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
-
-  const config = new DocumentBuilder()
-  .setTitle('Cats example')
-  .setDescription('The cats API description')
+// Everything the specs below have in common, so the full API and the per-module specs
+// all describe auth, headers and errors the same way.
+const baseDocument = (title: string, description: string) =>
+  new DocumentBuilder()
+  .setTitle(title)
+  .setDescription(description)
   .setVersion('1.0')
-  .addTag('cats')
   // Documents how the API is protected; it doesn't enforce anything itself.
   // RequestLoggerMiddleware reads the role from this header and RolesGuard checks it.
   // 'user-role' is the scheme's name, which @ApiSecurity('user-role') points at.
@@ -26,6 +27,23 @@ async function bootstrap() {
     },
     'user-role',
   )
+  // Global parameter: added to every route without touching any controller.
+  // RequestLoggerMiddleware runs on all routes and reads this header (falls back to "demo").
+  .addGlobalParameters({
+    name: 'x-user-id',
+    in: 'header',
+    required: false,
+    description: 'Id of the caller. Only used together with x-user-role; defaults to "demo".',
+    schema: { type: 'string' },
+  })
+  // Global response: any route can blow up, so document the 500 once instead of on every handler.
+  .addGlobalResponse({ status: 500, description: 'Internal server error' });
+
+async function bootstrap() {
+  const app = await NestFactory.create(AppModule);
+
+  const config = baseDocument('Cats example', 'The cats API description')
+  .addTag('cats')
   .build();
 
   // Lazy initialization
@@ -35,13 +53,38 @@ async function bootstrap() {
 
   // the options (including the zod-openapi converter) live in src/swagger/swaggerOptions.ts
   const documentFactory = () => SwaggerModule.createDocument(app, config, swaggerDocumentOptions);
-  SwaggerModule.setup('api', app, documentFactory,
+
+  // Multiple specifications: `include` limits a document to the routes of the listed modules.
+  // Each one gets its own UI page and its own JSON file.
+  const catsConfig = baseDocument('Cats', 'Only the cats routes').addTag('cats').build();
+  const catsDocumentFactory = () =>
+    SwaggerModule.createDocument(app, catsConfig, { ...swaggerDocumentOptions, include: [CatsModule] });
+  SwaggerModule.setup('api/cats', app, catsDocumentFactory, {
+    jsonDocumentUrl: 'api/cats/swagger.json',
+  });
+
+  const postsConfig = baseDocument('Posts', 'Only the posts routes').build();
+  const postsDocumentFactory = () =>
+    SwaggerModule.createDocument(app, postsConfig, { ...swaggerDocumentOptions, include: [PostsModule] });
+  SwaggerModule.setup('api/posts', app, postsDocumentFactory, {
+    jsonDocumentUrl: 'api/posts/swagger.json',
+  });
+
+  // The main page shows the whole API, plus a dropdown in the top bar to switch between specs.
+  // Each `url` must point at a JSON document, not at a UI page.
+  SwaggerModule.setup('api', app, documentFactory, {
     // can define opstions for swagger, where api in json can be accesssed.
     // by default the path is /api-json but we can provide a custom path
-    // {
-    //   jsonDocumentUrl: '/api-json',
-    // }
-  );
+    jsonDocumentUrl: 'api-json',
+    explorer: true,
+    swaggerOptions: {
+      urls: [
+        { name: 'Full API', url: '/api-json' },
+        { name: 'Cats', url: '/api/cats/swagger.json' },
+        { name: 'Posts', url: '/api/posts/swagger.json' },
+      ],
+    },
+  });
 
   // app.enableCors();
   // app.enableShutdownHooks();

@@ -19,6 +19,7 @@ import { AppController } from './app.controller.js';
 import { AppService } from './app.service.js';
 import { SeedModule } from './seed/seed.module.js';
 import { MailerModule } from '@nestjs-modules/mailer'
+import { AuthModule } from './auth/auth.module.js';
 
 @Module({
   imports: [
@@ -30,6 +31,7 @@ import { MailerModule } from '@nestjs-modules/mailer'
     // Loaded unless EXAMPLES_ENABLED=false (waits for env vars to be loaded)
     ConditionalModule.registerWhen(FeatureModule, 'EXAMPLES_ENABLED'),
     SeedModule,
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [

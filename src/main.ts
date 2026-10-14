@@ -13,6 +13,19 @@ async function bootstrap() {
   .setDescription('The cats API description')
   .setVersion('1.0')
   .addTag('cats')
+  // Documents how the API is protected; it doesn't enforce anything itself.
+  // RequestLoggerMiddleware reads the role from this header and RolesGuard checks it.
+  // 'user-role' is the scheme's name, which @ApiSecurity('user-role') points at.
+  // It also adds an "Authorize" button in Swagger UI that sends the header on "Try it out".
+  .addApiKey(
+    {
+      type: 'apiKey',
+      in: 'header',
+      name: 'x-user-role',
+      description: 'Role of the caller, e.g. "admin". Needed for admin-only routes.',
+    },
+    'user-role',
+  )
   .build();
 
   // Lazy initialization

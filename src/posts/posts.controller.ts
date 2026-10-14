@@ -10,7 +10,7 @@ import {
   UseGuards,
   UseInterceptors,
 } from '@nestjs/common';
-import { ApiResponse } from '@nestjs/swagger';
+import { ApiForbiddenResponse, ApiResponse, ApiSecurity } from '@nestjs/swagger';
 import * as z from 'zod';
 
 // custom decorators, guards, interceptors and dtos
@@ -51,6 +51,9 @@ export class PostsController {
 
   @Put(':id')
   @Roles(['admin'])
+  // Marks the route with the 'user-role' scheme from main.ts (a lock icon in Swagger UI).
+  @ApiSecurity('user-role')
+  @ApiForbiddenResponse({ description: 'x-user-role is missing or not "admin"' })
   @ApiResponse({ status: 200, standardSchema: postResponseSchema })
   update(@Param('id', ParseIntPipe) id: number, @Body({ schema: postSchema }) post: PostDto) {
     return this.postsService.update(id, post);
@@ -58,6 +61,8 @@ export class PostsController {
 
   @Delete(':id')
   @Roles(['admin'])
+  @ApiSecurity('user-role')
+  @ApiForbiddenResponse({ description: 'x-user-role is missing or not "admin"' })
   remove(@Param('id', ParseIntPipe) id: number) {
     return this.postsService.remove(id);
   }

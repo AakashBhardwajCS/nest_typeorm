@@ -8,6 +8,7 @@ import {
 import { ConditionalModule } from '@nestjs/config';
 import { APP_FILTER, APP_PIPE } from '@nestjs/core';
 import { AppConfigModule } from './config/config.module.js';
+import { CatsModule } from './cats/cats.module.js';
 import { NotFoundFilter } from './common/not-found.filter.js';
 import { RequestLoggerMiddleware } from './common/request-logger.middleware.js';
 import { DatabaseModule } from './database/database.module.js';
@@ -25,6 +26,7 @@ import { MailerModule } from '@nestjs-modules/mailer'
     DatabaseModule,
     PostsModule,
     MailModule,
+    CatsModule,
     // Loaded unless EXAMPLES_ENABLED=false (waits for env vars to be loaded)
     ConditionalModule.registerWhen(FeatureModule, 'EXAMPLES_ENABLED'),
     SeedModule,

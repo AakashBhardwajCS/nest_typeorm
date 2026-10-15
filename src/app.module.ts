@@ -18,7 +18,13 @@ import { PostsModule } from './posts/posts.module.js';
 import { AppController } from './app.controller.js';
 import { AppService } from './app.service.js';
 import { SeedModule } from './seed/seed.module.js';
+import { StorageModule } from '@nestjs/storage';
 import { MailerModule } from '@nestjs-modules/mailer'
+import { ConfigService } from '@nestjs/config';
+import { createStorageOptions } from './storage/storage.config.js';
+import { ProductsModule } from './products/products.module.js';
+import { OrdersModule } from './orders/orders.module.js';
+import { FilesModule } from './files/files.module.js';
 
 @Module({
   imports: [
@@ -30,6 +36,13 @@ import { MailerModule } from '@nestjs-modules/mailer'
     // Loaded unless EXAMPLES_ENABLED=false (waits for env vars to be loaded)
     ConditionalModule.registerWhen(FeatureModule, 'EXAMPLES_ENABLED'),
     SeedModule,
+    StorageModule.forRootAsync({
+      inject: [ConfigService],
+      useFactory: createStorageOptions,
+    }),
+    ProductsModule,
+    OrdersModule,
+    FilesModule,
   ],
   controllers: [AppController],
   providers: [

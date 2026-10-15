@@ -7,6 +7,7 @@ import {
   IsString,
   Max,
   Min,
+  MinLength,
   validateSync,
 } from 'class-validator';
 
@@ -68,6 +69,14 @@ export class EnvironmentVariables {
 
   @IsString()
   EMAIL_FROM: string;
+
+  @IsOptional()
+  @IsString()
+  STORAGE_ROOT?: string;
+
+  @IsString()
+  @MinLength(32)
+  STORAGE_SIGNING_KEY: string;
 }
 
 // Passed to ConfigModule.forRoot({ validate }).

@@ -3,6 +3,7 @@ import { ConfigModule } from '@nestjs/config';
 import appConfig from './app.config.js';
 import { AppConfigService } from './app-config.service.js';
 import { validate } from './env.validation.js';
+import storageConfig from './storage.config.js';
 
 @Global()
 @Module({
@@ -16,7 +17,7 @@ import { validate } from './env.validation.js';
       cache: true,
       // Allow ${VAR} references inside .env values
       expandVariables: true,
-      load: [appConfig],
+      load: [appConfig, storageConfig],
       validate,
     }),
   ],

@@ -13,23 +13,57 @@ import { NotFoundFilter } from './common/not-found.filter.js';
 import { RequestLoggerMiddleware } from './common/request-logger.middleware.js';
 import { DatabaseModule } from './database/database.module.js';
 import { FeatureModule } from './examples/feature.module.js';
-import { MailModule } from './mail/mail.module.js';
+// import { MailModule } from './mail/mail.module.js';
 import { PostsModule } from './posts/posts.module.js';
 import { AppController } from './app.controller.js';
 import { AppService } from './app.service.js';
 import { SeedModule } from './seed/seed.module.js';
-import { MailerModule } from '@nestjs-modules/mailer'
+import { AuthenticationModule } from '@nestjs/authentication';
+import path, { join } from 'path';
+
+import {
+  FileTemplateEngine,
+  LogMailTransport,
+  MailModule,
+  SmtpTransport,
+} from '@nestjs/mail';
+import { AuthModule } from './auth/auth.module.js';
 
 @Module({
   imports: [
     AppConfigModule,
     DatabaseModule,
     PostsModule,
-    MailModule,
+    MailModule.forRootAsync({
+      useFactory: () => ({
+        transport: process.env.SMTP_URL ? new SmtpTransport({ url: process.env.SMTP_URL }) : new LogMailTransport(),
+        templates: new FileTemplateEngine({ dir: join(import.meta.dirname, 'mail/templates') }),
+        from: 'Accounts <accounts@example.com>',
+      }),
+    }),
     CatsModule,
     // Loaded unless EXAMPLES_ENABLED=false (waits for env vars to be loaded)
     ConditionalModule.registerWhen(FeatureModule, 'EXAMPLES_ENABLED'),
     SeedModule,
+    AuthenticationModule.forRoot({
+      session: {
+        absoluteTtl: '14d',
+        idleTtl: '3d',
+      },
+    }),
+    AuthModule,
+    MailModule.forRootAsync({
+  useFactory: () => ({
+    transport: process.env.SMTP_URL
+      ? new SmtpTransport({ url: process.env.SMTP_URL })
+      : new LogMailTransport(),
+    templates: new FileTemplateEngine({
+      dir: join(import.meta.dirname, 'mail/templates'),
+    }),
+    from: 'Accounts <accounts@example.com>',
+  }),
+    }),
+
   ],
   controllers: [AppController],
   providers: [

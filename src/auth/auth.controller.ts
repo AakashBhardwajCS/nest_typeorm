@@ -3,6 +3,7 @@ import { Body, Controller, HttpCode, Post, UnauthorizedException } from '@nestjs
 import { Public, SignInService } from '@nestjs/authentication';
 import { SignInDto, SignUpDto } from './auth.dto.js';
 import { CredentialsService } from './credentials.service.js';
+import { EmailVerificationService } from './email-verification.service.js';
 
 @Public()
 @Controller('auth')
@@ -16,7 +17,10 @@ export class AuthController {
   @Post('sign-up')
   async signUp(@Body() body: SignUpDto) {
     const user = await this.credentialsService.register(body.email, body.password);
+
     await this.signInService.signIn(user.id, { method: 'password' });
+
+    await this.emailVerificationService.send(user);
     return user;
   }
 
